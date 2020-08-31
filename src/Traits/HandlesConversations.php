@@ -117,10 +117,10 @@ trait HandlesConversations
      * @param Closure $closure
      * @return string
      */
-    public function serializeClosure(Closure $closure)
+    public function serializeClosure($closure)
     {
         if ($this->getDriver()->serializesCallbacks() && ! $this->runsOnSocket) {
-            return serialize(new SerializableClosure($closure, true));
+            return \Opis\Closure\serialize($closure);
         }
 
         return $closure;
@@ -128,12 +128,19 @@ trait HandlesConversations
 
     /**
      * @param mixed $closure
-     * @return string
+     * @return callable|\React\Promise\Deferred
      */
     protected function unserializeClosure($closure)
     {
         if ($this->getDriver()->serializesCallbacks() && ! $this->runsOnSocket) {
-            return unserialize($closure);
+            $unserialized = unserialize($closure);
+
+            // support serialized promises
+            if ($this->isPromise($unserialized)) {
+                $unserialized = \Opis\Closure\unserialize($closure);
+            }
+
+            return $unserialized;
         }
 
         return $closure;
@@ -229,7 +236,7 @@ trait HandlesConversations
             $this->message = $message;
             $this->currentConversationData = $convo;
 
-            if (is_callable($next)) {
+            if (is_callable($next) || $this->isPromise($next)) {
                 $this->callConversation($next, $convo, $message, $parameters);
             }
         });
@@ -277,19 +284,37 @@ trait HandlesConversations
     }
 
     /**
-     * @param Closure $next
+     * @param Closure|\React\Promise\Deferred $next
      * @param Conversation $conversation
      * @param array $parameters
      */
     protected function prepareConversationClosure($next, Conversation $conversation, array $parameters)
     {
-        if ($next instanceof SerializableClosure) {
-            $next = $next->getClosure()->bindTo($conversation, $conversation);
-        } elseif ($next instanceof Closure) {
-            $next = $next->bindTo($conversation, $conversation);
-        }
 
-        $parameters[] = $conversation;
-        call_user_func_array($next, $parameters);
+        // if this is a promise, prepare & resolve
+        if ($this->isPromise($next)) {
+            $answer = array_shift($parameters);
+            $next->resolve([$answer, $conversation]);
+        } else {
+            if ($next instanceof SerializableClosure) {
+                $next = $next->getClosure()->bindTo($conversation, $conversation);
+            } elseif ($next instanceof Closure) {
+                $next = $next->bindTo($conversation, $conversation);
+            }
+
+            $parameters[] = $conversation;
+            call_user_func_array($next, $parameters);
+        }
+    }
+
+    /**
+     * Determine if the `next` closure is in fact a deferred promise
+     *
+     * @param callable|\React\Promise\Deferred $next
+     * @return boolean
+     */
+    protected function isPromise($next)
+    {
+        return $next instanceof \React\Promise\Deferred;
     }
 }
