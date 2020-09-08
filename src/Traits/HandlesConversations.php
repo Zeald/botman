@@ -308,13 +308,16 @@ trait HandlesConversations
     }
 
     /**
-     * Determine if the `next` closure is in fact a deferred promise
+     * Determine if the `next` closure is an object that looks like a Promise
+     * (in that it has a `for` and `resolve` method)
      *
-     * @param callable|\App\Extensions\QuestionPromise $next
+     * @param callable|mixed $next a closure or a promise instance
      * @return boolean
      */
     protected function isPromise($next)
     {
-        return $next instanceof \App\Extensions\QuestionPromise;
+        return is_object($next)
+            && method_exists($next, 'for')
+            && method_exists($next, 'resolve');
     }
 }
