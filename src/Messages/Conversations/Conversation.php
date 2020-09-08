@@ -55,11 +55,11 @@ abstract class Conversation
 
     /**
      * @param string|Question $question
-     * @param array|Closure $next
+     * @param array|Closure
      * @param array $additionalParameters
      * @return $this
      */
-    public function ask($question, $next, $additionalParameters = [])
+    public function ask($question, $next = null, $additionalParameters = [])
     {
         $this->bot->reply($question, $additionalParameters);
         $this->bot->storeConversation($this, $next, $question, $additionalParameters);
@@ -74,7 +74,7 @@ abstract class Conversation
      * @param array $additionalParameters
      * @return $this
      */
-    public function askForImages($question, $next, $repeat = null, $additionalParameters = [])
+    public function askForImages($question, $next = null, $repeat = null, $additionalParameters = [])
     {
         $additionalParameters['__getter'] = 'getImages';
         $additionalParameters['__pattern'] = Image::PATTERN;
@@ -90,7 +90,7 @@ abstract class Conversation
      * @param array $additionalParameters
      * @return $this
      */
-    public function askForVideos($question, $next, $repeat = null, $additionalParameters = [])
+    public function askForVideos($question, $next = null, $repeat = null, $additionalParameters = [])
     {
         $additionalParameters['__getter'] = 'getVideos';
         $additionalParameters['__pattern'] = Video::PATTERN;
@@ -106,7 +106,7 @@ abstract class Conversation
      * @param array $additionalParameters
      * @return $this
      */
-    public function askForAudio($question, $next, $repeat = null, $additionalParameters = [])
+    public function askForAudio($question, $next = null, $repeat = null, $additionalParameters = [])
     {
         $additionalParameters['__getter'] = 'getAudio';
         $additionalParameters['__pattern'] = Audio::PATTERN;
@@ -122,7 +122,7 @@ abstract class Conversation
      * @param array $additionalParameters
      * @return $this
      */
-    public function askForLocation($question, $next, $repeat = null, $additionalParameters = [])
+    public function askForLocation($question, $next = null, $repeat = null, $additionalParameters = [])
     {
         $additionalParameters['__getter'] = 'getLocation';
         $additionalParameters['__pattern'] = Location::PATTERN;
