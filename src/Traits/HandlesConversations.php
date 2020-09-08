@@ -128,7 +128,7 @@ trait HandlesConversations
 
     /**
      * @param mixed $closure
-     * @return callable|\React\Promise\Deferred
+     * @return callable|\App\Extensions\QuestionPromise
      */
     protected function unserializeClosure($closure)
     {
@@ -284,7 +284,7 @@ trait HandlesConversations
     }
 
     /**
-     * @param Closure|\React\Promise\Deferred $next
+     * @param Closure|\App\Extensions\QuestionPromise $next
      * @param Conversation $conversation
      * @param array $parameters
      */
@@ -293,8 +293,8 @@ trait HandlesConversations
 
         // if this is a promise, prepare & resolve
         if ($this->isPromise($next)) {
-            $answer = array_shift($parameters);
-            $next->resolve([$answer, $conversation]);
+            $next->for($conversation)
+                ->resolve(...$parameters);
         } else {
             if ($next instanceof SerializableClosure) {
                 $next = $next->getClosure()->bindTo($conversation, $conversation);
@@ -310,11 +310,11 @@ trait HandlesConversations
     /**
      * Determine if the `next` closure is in fact a deferred promise
      *
-     * @param callable|\React\Promise\Deferred $next
+     * @param callable|\App\Extensions\QuestionPromise $next
      * @return boolean
      */
     protected function isPromise($next)
     {
-        return $next instanceof \React\Promise\Deferred;
+        return $next instanceof \App\Extensions\QuestionPromise;
     }
 }
