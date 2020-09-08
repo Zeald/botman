@@ -128,7 +128,7 @@ trait HandlesConversations
 
     /**
      * @param mixed $closure
-     * @return callable|\App\Extensions\QuestionPromise
+     * @return callable|mixed a closure or promise instance
      */
     protected function unserializeClosure($closure)
     {
@@ -284,7 +284,7 @@ trait HandlesConversations
     }
 
     /**
-     * @param Closure|\App\Extensions\QuestionPromise $next
+     * @param Closure|mixed $next closure or a promise instance
      * @param Conversation $conversation
      * @param array $parameters
      */
