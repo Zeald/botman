@@ -315,6 +315,6 @@ trait HandlesConversations
      */
     protected function isPromise($next)
     {
-        return $next instanceof \App\Extensions\QuestionPromise;
+        return $next instanceof BotMan\BotMan\Messages\Conversations\QuestionPromise;
     }
 }
