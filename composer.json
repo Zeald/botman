@@ -15,7 +15,7 @@
         }
     ],
     "require": {
-        "php": ">=7.2",
+        "php": ">=7.3.0",
         "symfony/http-foundation": "^5.0",
         "tightenco/collect": "^7.12",
         "opis/closure": "^3.1",
